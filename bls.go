@@ -11,17 +11,16 @@
 
 package bls
 
-import (
-	"crypto/sha256"
-	"errors"
-	"math/big"
-	"unsafe"
-)
+import	"crypto/sha256"
+import	"errors"
+import	"math/big"
+import	"unsafe"
 
 /*
 #cgo LDFLAGS: -lgmp -lpbc
 #include <pbc/pbc.h>
 #include <stdio.h>
+#include <stdlib.h>
 int callback(pbc_cm_t cm, void *data) {
 	pbc_param_init_d_gen(data, cm);
 	return 1;
