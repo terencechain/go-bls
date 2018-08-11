@@ -24,5 +24,18 @@ func TestOneTimeSignVerify(t *testing.T) {
 
 	// Establish a channel to share data across
 	messageChannel := make(chan *data)
+
+	// Public key distribution
+	c1 := make(chan []byte)
+	c2 := make(chan []byte)
+	c3 := make(chan []byte)
+
+	// Done channel for blocking purpose
+	done := make(chan bool)
+
+
+	// In the end, waiting for all channels communication to finish
+	<-done
+	<-done
 }
 
