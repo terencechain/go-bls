@@ -1,9 +1,10 @@
 package bls
 
 import (
-	"testing"
 	"github.com/Nik-U/pbc"
+	"testing"
 
+	"crypto/sha256"
 )
 
 type data struct {
@@ -11,31 +12,27 @@ type data struct {
 	sig []byte
 }
 
-func TestOneTimeSignVerify(t *testing.T) {
+func TestOneTimeVerification(t *testing.T) {
 
-	// Setting up new paring
+	// Setting up new pairing
 	params := pbc.GenerateA(160, 512)
-	paring := params.NewPairing()
-	generator := paring.NewG1().Rand()
+	pairing := params.NewPairing()
+	generator := pairing.NewG2().Rand()
 
-	// We should send the generator to the participants
-	sharedParams := params.String()
-	sharedGenerator := generator.Bytes()
+	privateKey1 := pairing.NewZr().Rand()
+	pubKey1 := pairing.NewG2().PowZn(generator, privateKey1)
 
-	// Establish a channel to share data across
-	messageChannel := make(chan *data)
+	t.Log(privateKey1.Bytes()) // 20 bytes
+	t.Log(pubKey1.Bytes())     // 128 bytes
 
-	// Public key distribution
-	c1 := make(chan []byte)
-	c2 := make(chan []byte)
-	c3 := make(chan []byte)
+	// Sign a message, hash it to h
+	message := "today is a good day"
+	h := pairing.NewG1().SetFromStringHash(message, sha256.New())
 
-	// Done channel for blocking purpose
-	done := make(chan bool)
+	sig1 := pairing.NewG2().PowZn(h, privateKey1)
 
-
-	// In the end, waiting for all channels communication to finish
-	<-done
-	<-done
+	// To verify, we check that e(h,g^x)=e(sig,g)
+	if !pairing.NewGT().Pair(h, pubKey1).Equals(pairing.NewGT().Pair(sig1, generator)) {
+		t.Error("Signature verificaiton failed")
+	}
 }
-

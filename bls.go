@@ -514,22 +514,6 @@ func (pairing Pairing) Free() {
 	C.pairing_clear(pairing.get)
 }
 
-// ToBytes exports Params to a byte slice.
-// The output format is a custom set of ASCII key-value pairs. Pairs are
-// separated by the space character (` `), and delimited by a newline (`\n`).
-func (params Params) ToBytes() ([]byte, error) {
-	var buf *C.char
-	var size C.size_t
-
-	f := C.open_memstream(&buf, &size)
-	defer C.free(unsafe.Pointer(buf))
-
-	C.pbc_param_out_str(f, params.get)
-	C.fclose(f)
-
-	return C.GoBytes(unsafe.Pointer(buf), C.int(size)), nil
-}
-
 // Free the memory occupied by the cryptosystem. The cryptosystem cannot be used
 // after calling this function.
 func (system System) Free() {
